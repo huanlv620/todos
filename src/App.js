@@ -1,23 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useRef } from "react";
+import { useStore, actions } from "./store";
 function App() {
+  const inputRef = useRef();
+  const [state, dispatch] = useStore();
+  const handleAdd = () => {
+    dispatch(actions.addTodo(state.todoInput));
+    dispatch(actions.setTodoInput(""));
+    inputRef.current.focus();
+  };
+  const storageTodos = JSON.parse(localStorage.getItem("todos"));
+  console.log("storageTodos", storageTodos);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 20 }}>
+      <input
+        value={state.todoInput}
+        onChange={(e) => dispatch(actions.setTodoInput(e.target.value))}
+        ref={inputRef}
+      />
+      <button onClick={handleAdd}>ADD</button>
+      <ul>
+        {state.todos.map((todo, index) => (
+          <li key={index}>
+            {todo}
+            <span
+              onClick={() => {
+                dispatch(actions.deleteTodo(index));
+              }}
+            >
+              &times;
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
